@@ -37,10 +37,19 @@ export const extractNumStrings = (txt: string, numLocale: string) => {
   return nums;
 };
 
-export const getNumberFromElement = (cssSelector: string, locale: string) => {
+export const getNumberFromElement = (
+  cssSelector: string,
+  locale: string,
+  ariaLableText?: boolean
+) => {
   const elem = document.querySelector<HTMLElement>(cssSelector);
-  const elemText = elem?.innerText || elem?.textContent || "";
-  const numString = extractNumStrings(elemText, locale)[0];
+  if (!elem) return 0;
+
+  const elemText =
+    (ariaLableText
+      ? elem.getAttribute("aria-label")
+      : elem.innerText || elem.textContent) || "";
+  const numString = extractNumStrings(elemText, locale)[0] || "0";
 
   return parseNumber(numString, locale) || 0;
 };

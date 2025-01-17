@@ -25,7 +25,7 @@ const attentionScore = derived(() => {
 
   const lang = document.documentElement.lang;
   const viewsCount = getNumberFromElement(SELECTOR.VIEWS_ELEM, lang);
-  const likesCount = getNumberFromElement(SELECTOR.LIKES_ELEM, lang);
+  const likesCount = getNumberFromElement(SELECTOR.LIKES_ELEM, lang, true);
 
   const score = (1000 * likesCount) / viewsCount;
   const scoreString = score.toFixed(score < 10 ? 1 : 0);
