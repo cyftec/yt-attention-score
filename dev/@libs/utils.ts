@@ -13,7 +13,6 @@ export const parseNumber = (numString: string, numLocale: string) => {
 
 export const extractNumStrings = (txt: string, numLocale: string) => {
   const words = txt.replaceAll("  ", " ").split(" ");
-  // console.log(words);
   const nums: string[] = [];
 
   const oneNumStack: string[] = [];
@@ -36,4 +35,12 @@ export const extractNumStrings = (txt: string, numLocale: string) => {
   }
 
   return nums;
+};
+
+export const getNumberFromElement = (cssSelector: string, locale: string) => {
+  const elem = document.querySelector<HTMLElement>(cssSelector);
+  const elemText = elem?.innerText || elem?.textContent || "";
+  const numString = extractNumStrings(elemText, locale)[0];
+
+  return parseNumber(numString, locale) || 0;
 };

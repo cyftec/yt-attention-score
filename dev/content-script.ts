@@ -1,67 +1,54 @@
-import { m } from "@mufw/maya";
 import { derived, signal } from "@cyftech/signal";
-import { extractNumStrings, parseNumber } from "./@libs/utils";
+import { m } from "@mufw/maya";
+import { ATTENTION, SELECTOR, UI_ELEM_ID } from "./@libs/constants";
+import { getNumberFromElement } from "./@libs/utils";
 
 /**
- * KNOW ISSUE
+ * This extension uses the data coming in aria-label and/or tooltips for a more
+ * correct  and unabbreviated number (e.g. 2M for 2,000,000);
  *
- * Sometimes the locale number string in aria-label mismatches that with
+ * KNOWN ISSUE
+ * Sometimes the locale number format in aria-label mismatches that with
  * the locale set for the document. That results in an incorrect score.
  *
- * E.g. in case of 'bosanski' language of the document is 'bs-Latn-BA'
- * (check html[lang="bs-Latn-BA"] for same), which should have decimal
- * representated with a comma (','). While the number string in aria-label
- * of like button has number with point (.) decimal.
+ * For example, in case of 'bosanski' language, the 'lang' attribute of the document
+ * is set to 'bs-Latn-BA' (check html[lang="bs-Latn-BA"] for same), in which the
+ * decimal in a number is representated with a comma (','). While the formatted
+ * number string coming from backend for like button's aria-label has the
+ * opposite, i.e. number with point (.) decimal.
  */
 
 const videoUpdatedCount = signal(0);
 
 const attentionScore = derived(() => {
   if (!videoUpdatedCount.value) return "0";
+
   const lang = document.documentElement.lang;
+  const viewsCount = getNumberFromElement(SELECTOR.VIEWS_ELEM, lang);
+  const likesCount = getNumberFromElement(SELECTOR.LIKES_ELEM, lang);
 
-  const viewsElem = document.querySelector<HTMLElement>(
-    `#ytd-watch-info-text #tooltip`
-  );
-  const viewsElemText = viewsElem?.innerText || viewsElem?.textContent || "";
-  const viewsCountStr = extractNumStrings(viewsElemText, lang)[0] || "0";
-  const viewsCount = parseNumber(viewsCountStr, lang);
+  const score = (1000 * likesCount) / viewsCount;
+  const scoreString = score.toFixed(score < 10 ? 1 : 0);
+  console.log(`Attention score for current video is ${scoreString}`);
 
-  const likesElem = document.querySelector<HTMLElement>(
-    `like-button-view-model button`
-  );
-  const ariaLabelText = likesElem?.getAttribute("aria-label") || "";
-  const likesCountStr = extractNumStrings(ariaLabelText, lang)[0] || "0";
-  const likesCount = parseNumber(likesCountStr, lang) ?? 0;
-
-  console.log(likesCount);
-  console.log(viewsCount);
-
-  const attentionScore = (1000 * likesCount) / viewsCount;
-  const attentionScoreString = attentionScore.toFixed(
-    attentionScore < 10 ? 1 : 0
-  );
-  console.log(attentionScoreString);
-
-  return attentionScoreString;
+  return scoreString;
 });
 
 const attentionEmoji = derived(() => {
   const attentionScoreNum = parseFloat(attentionScore.value);
 
-  if (attentionScoreNum < 10) return "😑";
-  if (attentionScoreNum < 25) return "🙂";
-  if (attentionScoreNum < 50) return "😃";
-  if (attentionScoreNum < 100) return "🤩";
-
-  return "😲";
+  if (attentionScoreNum < 10) return ATTENTION.OKAY;
+  if (attentionScoreNum < 25) return ATTENTION.GOOD;
+  if (attentionScoreNum < 50) return ATTENTION.AWESOME;
+  if (attentionScoreNum < 100) return ATTENTION.FABULOUS;
+  return ATTENTION.UNEXPECTED;
 });
 
 const attentionScoreUI = m.Div({
-  id: "attention-score",
+  id: UI_ELEM_ID,
   children: [
     m.Style(`
-      .igs-container {
+      .atscore-container {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -73,21 +60,21 @@ const attentionScoreUI = m.Div({
         font-weight: bold;
       }
 
-      .igs-icon {
+      .atscore-icon {
         font-size: 16px;
         padding: 4px;
       }
         
-      .igs-text {
+      .atscore-text {
         font-size: 15px;
         padding: 4px;
       }
     `),
     m.Div({
-      class: "igs-container",
+      class: "atscore-container",
       children: [
-        m.Span({ class: "igs-icon", children: attentionEmoji }),
-        m.Span({ class: "igs-text", children: attentionScore }),
+        m.Span({ class: "atscore-icon", children: attentionEmoji }),
+        m.Span({ class: "atscore-text", children: attentionScore }),
       ],
     }),
   ],
@@ -96,7 +83,7 @@ const attentionScoreUI = m.Div({
 const updateUI = () => {
   videoUpdatedCount.value++;
   const container = document.querySelector<HTMLElement>(
-    "#above-the-fold #title"
+    SELECTOR.CONTAINER_ELEM
   );
   if (!container) return;
 
@@ -105,7 +92,7 @@ const updateUI = () => {
     "display: flex; align-items: center; padding-bottom: 10px;"
   );
 
-  if (container.firstElementChild?.id === "attention-score") {
+  if (container.firstElementChild?.id === UI_ELEM_ID) {
     container.replaceChild(attentionScoreUI, container.firstElementChild);
   } else {
     container.prepend(attentionScoreUI);
