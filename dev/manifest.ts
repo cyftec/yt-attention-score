@@ -15,15 +15,15 @@ const manifest: chrome.runtime.ManifestV3 = {
   ],
   web_accessible_resources: [
     {
-      resources: ["assets/logo.png"],
+      resources: ["assets/images/logo.png"],
       matches: ["https://*.youtube.com/*"],
     },
   ],
   action: {
     default_icon: {
-      "16": "assets/logo.png",
-      "24": "assets/logo.png",
-      "32": "assets/logo.png",
+      "16": "assets/images/logo.png",
+      "24": "assets/images/logo.png",
+      "32": "assets/images/logo.png",
     },
     default_title: "YouTube Ignore Score",
     default_popup: "popup/index.html",

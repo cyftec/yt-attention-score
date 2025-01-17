@@ -1,3 +1,5 @@
+import { m } from "@mufw/maya";
+import { derived, signal } from "@cyftech/signal";
 import { extractNumStrings, parseNumber } from "./@libs/utils";
 
 /**
@@ -12,32 +14,111 @@ import { extractNumStrings, parseNumber } from "./@libs/utils";
  * of like button has number with point (.) decimal.
  */
 
-(() => {
-  const loadIgnoreScore = () => {
-    const lang = document.documentElement.lang;
+const videoUpdatedCount = signal(0);
 
-    const viewsMetaElem = document.querySelector<HTMLElement>(
-      `[itemprop="interactionCount"]`
-    );
-    const viewsCountStr = viewsMetaElem?.getAttribute("content") || "0";
-    const viewsCount = parseNumber(viewsCountStr, lang);
+const attentionScore = derived(() => {
+  if (!videoUpdatedCount.value) return "0";
+  const lang = document.documentElement.lang;
 
-    const likesElem = document.querySelector<HTMLElement>(
-      `like-button-view-model button`
-    );
-    const ariaLabelText = likesElem?.getAttribute("aria-label") || "";
-    const likesCountStr = extractNumStrings(ariaLabelText, lang)[0] || "0";
-    const likesCount = parseNumber(likesCountStr, lang) ?? 0;
+  const viewsElem = document.querySelector<HTMLElement>(
+    `#ytd-watch-info-text #tooltip`
+  );
+  const viewsElemText = viewsElem?.innerText || viewsElem?.textContent || "";
+  const viewsCountStr = extractNumStrings(viewsElemText, lang)[0] || "0";
+  const viewsCount = parseNumber(viewsCountStr, lang);
 
-    const ignoreScore = viewsCount / likesCount;
-    const ignoreScoreString = ignoreScore.toFixed(ignoreScore < 10 ? 1 : 0);
-    console.log(ignoreScoreString); // 61.59349463227047
-  };
+  const likesElem = document.querySelector<HTMLElement>(
+    `like-button-view-model button`
+  );
+  const ariaLabelText = likesElem?.getAttribute("aria-label") || "";
+  const likesCountStr = extractNumStrings(ariaLabelText, lang)[0] || "0";
+  const likesCount = parseNumber(likesCountStr, lang) ?? 0;
 
+  console.log(likesCount);
+  console.log(viewsCount);
+
+  const attentionScore = (1000 * likesCount) / viewsCount;
+  const attentionScoreString = attentionScore.toFixed(
+    attentionScore < 10 ? 1 : 0
+  );
+  console.log(attentionScoreString);
+
+  return attentionScoreString;
+});
+
+const attentionEmoji = derived(() => {
+  const attentionScoreNum = parseFloat(attentionScore.value);
+
+  if (attentionScoreNum < 10) return "😑";
+  if (attentionScoreNum < 25) return "🙂";
+  if (attentionScoreNum < 50) return "😃";
+  if (attentionScoreNum < 100) return "🤩";
+
+  return "😲";
+});
+
+const attentionScoreUI = m.Div({
+  id: "attention-score",
+  children: [
+    m.Style(`
+      .igs-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50px;
+        background-color: #f2f2f2;
+        color: #666;
+        padding: 1px 10px;
+        margin-right: 10px;
+        font-weight: bold;
+      }
+
+      .igs-icon {
+        font-size: 16px;
+        padding: 4px;
+      }
+        
+      .igs-text {
+        font-size: 15px;
+        padding: 4px;
+      }
+    `),
+    m.Div({
+      class: "igs-container",
+      children: [
+        m.Span({ class: "igs-icon", children: attentionEmoji }),
+        m.Span({ class: "igs-text", children: attentionScore }),
+      ],
+    }),
+  ],
+})();
+
+const updateUI = () => {
+  videoUpdatedCount.value++;
+  const container = document.querySelector<HTMLElement>(
+    "#above-the-fold #title"
+  );
+  if (!container) return;
+
+  container.setAttribute(
+    "style",
+    "display: flex; align-items: center; padding-bottom: 10px;"
+  );
+
+  if (container.firstElementChild?.id === "attention-score") {
+    container.replaceChild(attentionScoreUI, container.firstElementChild);
+  } else {
+    container.prepend(attentionScoreUI);
+  }
+};
+
+const runExtension = () => {
   chrome.runtime.onMessage.addListener((message) => {
     if (message.videoLoaded) {
-      loadIgnoreScore();
+      updateUI();
     }
   });
-  loadIgnoreScore();
-})();
+  updateUI();
+};
+
+runExtension();
