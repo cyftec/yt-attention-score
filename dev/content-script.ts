@@ -5,7 +5,7 @@ import { getNumberFromElement } from "./@libs/utils";
 
 /**
  * This extension uses the data coming in aria-label and/or tooltips for a more
- * correct  and unabbreviated number (e.g. 2M for 2,000,000);
+ * correct and unabbreviated number (e.g. 2M for 2,000,000);
  *
  * KNOWN ISSUE
  * Sometimes the locale number format in aria-label mismatches that with
@@ -28,7 +28,7 @@ const attentionScore = derived(() => {
   const likesCount = getNumberFromElement(SELECTOR.LIKES_ELEM, lang, true);
 
   const score = (1000 * likesCount) / viewsCount;
-  const scoreString = score.toFixed(score < 10 ? 1 : 0);
+  const scoreString = score.toFixed(0);
   console.log(`Attention score for current video is ${scoreString}`);
 
   return scoreString;
@@ -36,7 +36,6 @@ const attentionScore = derived(() => {
 
 const attentionEmoji = derived(() => {
   const attentionScoreNum = parseFloat(attentionScore.value);
-
   if (attentionScoreNum < 10) return ATTENTION.OKAY;
   if (attentionScoreNum < 25) return ATTENTION.GOOD;
   if (attentionScoreNum < 50) return ATTENTION.AWESOME;
