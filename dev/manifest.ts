@@ -1,22 +1,28 @@
+import {
+  APP_DESCRIPTION,
+  APP_NAME,
+  HOST_URL_IDENTIFIER,
+} from "./@libs/constants";
+
 const manifest: chrome.runtime.ManifestV3 = {
-  name: "Youtube Ignore Score",
+  name: APP_NAME,
   version: "0.0.1",
-  description: "Youtube Ignore Score",
+  description: APP_DESCRIPTION,
   permissions: ["tabs"],
-  host_permissions: ["https://*.youtube.com/*"],
+  host_permissions: [HOST_URL_IDENTIFIER],
   background: {
     service_worker: "sw.js",
   },
   content_scripts: [
     {
-      matches: ["https://*.youtube.com/*"],
+      matches: [HOST_URL_IDENTIFIER],
       js: ["content-script.js"],
     },
   ],
   web_accessible_resources: [
     {
       resources: ["assets/images/logo.png"],
-      matches: ["https://*.youtube.com/*"],
+      matches: [HOST_URL_IDENTIFIER],
     },
   ],
   action: {
@@ -25,7 +31,7 @@ const manifest: chrome.runtime.ManifestV3 = {
       "24": "assets/images/logo.png",
       "32": "assets/images/logo.png",
     },
-    default_title: "YouTube Ignore Score",
+    default_title: APP_NAME,
     default_popup: "popup/index.html",
   },
   manifest_version: 3,

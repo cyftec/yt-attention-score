@@ -1,71 +1,84 @@
-import type { RegeneratableFilesMap, KarmaConfig } from "./karma-types.ts";
-
-const APP_ROOT_DIRNAME = "dev";
-
-const RG = {
-  STAGING_DIRNAME: "stage",
-  PUBLISH_DIRNAME: "prod",
-  BUN_LOCKB: "bun.lockb",
-  GIT_IGNORE: ".gitignore",
-  DOT_VSCODE_DIR: ".vscode",
-  DOT_ENV_FILE: ".env",
-  NODE_MODULES_DIR: "node_modules",
-  PACKAGE_JSON_FILE: "package.json",
-};
+import type { KarmaConfig, ProjectFileNames } from "./karma-types.ts";
 
 // DO NOT CHANGE exported variable name
-export const regeneratables: RegeneratableFilesMap = RG;
+export const projectFileNames: ProjectFileNames = {
+  systemGenerated: {
+    dsStoreDir: ".DS_Store",
+  },
+  static: {
+    sourceDir: "dev",
+    karmaTypesFile: "karma-types.ts",
+  },
+  generated: {
+    stagingDir: "stage",
+    publishDir: "prod",
+    bunLockFile: "bun.lock",
+    bunLockBFile: "bun.lockb",
+    gitIgnoreFile: ".gitignore",
+    dotVscodeDir: ".vscode",
+    nodeModulesDir: "node_modules",
+    packageJsonFile: "package.json",
+  },
+  buildable: {
+    pageFile: "page.ts",
+    manifestFile: "manifest.ts",
+  },
+};
 
 // DO NOT CHANGE exported variable name
 export const config: KarmaConfig = {
   brahma: {
     build: {
-      sourceDirName: APP_ROOT_DIRNAME,
-      stagingDirName: RG.STAGING_DIRNAME,
-      publishDirName: RG.PUBLISH_DIRNAME,
-      srcPageFileName: "page.ts",
-      srcManifestFileName: "manifest.ts",
+      stagingDirName: projectFileNames.generated.stagingDir,
+      publishDirName: projectFileNames.generated.publishDir,
+      buildablePageFileName: projectFileNames.buildable.pageFile,
+      buildableManifestFileName: projectFileNames.buildable.manifestFile,
       ignoreDelimiter: "@",
     },
     localServer: {
       port: 3000,
-      redirectOnStage: false,
-      reloadPageOnFocus: false,
+      redirectOnStart: false,
+      reloadPageOnFocus: true,
+      serveDirectory: `${projectFileNames.generated.stagingDir}`,
     },
   },
-  packageJson: {
-    dependencies: {
-      "@mufw/maya": "0.1.8",
-      "@types/chrome": "^0.0.293",
+  maya: {
+    mode: "ext",
+    sourceDirName: projectFileNames.static.sourceDir,
+    packageJson: {
+      dependencies: {
+        "@mufw/maya": "0.1.10",
+        "@types/chrome": "0.0.297",
+      },
     },
-  },
-  git: {
-    ignore: [
-      ".DS_Store",
-      "karma-types.ts",
-      `/${RG.STAGING_DIRNAME}`,
-      `/${RG.PUBLISH_DIRNAME}`,
-      RG.BUN_LOCKB,
-      RG.DOT_VSCODE_DIR,
-      RG.DOT_ENV_FILE,
-      RG.NODE_MODULES_DIR,
-      RG.PACKAGE_JSON_FILE,
-    ],
   },
   vscode: {
     settings: {
       "deno.enable": false,
       "files.exclude": {
-        "karma-types.ts": true,
-        [RG.STAGING_DIRNAME]: false,
-        [RG.PUBLISH_DIRNAME]: false,
-        [RG.BUN_LOCKB]: true,
-        [RG.GIT_IGNORE]: true,
-        [RG.DOT_VSCODE_DIR]: true,
-        [RG.DOT_ENV_FILE]: true,
-        [RG.NODE_MODULES_DIR]: true,
-        [RG.PACKAGE_JSON_FILE]: true,
+        [projectFileNames.static.karmaTypesFile]: true,
+        [projectFileNames.generated.stagingDir]: false,
+        [projectFileNames.generated.publishDir]: false,
+        [projectFileNames.generated.bunLockFile]: true,
+        [projectFileNames.generated.bunLockBFile]: true,
+        [projectFileNames.generated.gitIgnoreFile]: true,
+        [projectFileNames.generated.dotVscodeDir]: true,
+        [projectFileNames.generated.nodeModulesDir]: true,
+        [projectFileNames.generated.packageJsonFile]: true,
       },
     },
+  },
+  git: {
+    ignore: [
+      projectFileNames.systemGenerated.dsStoreDir,
+      projectFileNames.static.karmaTypesFile,
+      projectFileNames.generated.bunLockFile,
+      projectFileNames.generated.bunLockBFile,
+      projectFileNames.generated.dotVscodeDir,
+      projectFileNames.generated.nodeModulesDir,
+      projectFileNames.generated.packageJsonFile,
+      `/${projectFileNames.generated.stagingDir}`,
+      `/${projectFileNames.generated.publishDir}`,
+    ],
   },
 };
