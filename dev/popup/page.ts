@@ -1,17 +1,13 @@
 import { derived, signal } from "@cyftech/signal";
-import { m, MHtmlElement } from "@mufw/maya";
-import {
-  Footer,
-  Header,
-  Limitations,
-  Overview,
-  Scrollable,
-  Tabs,
-} from "./@components";
+import { m } from "@mufw/maya";
+import { PARAGRAPHS } from "../@libs/constants";
+import { TabType } from "../types";
+import { Footer, Header, Paragraphs, Scrollable, Tabs } from "./@components";
 
-type TabType = "Overview" | "Limitations";
 const tabs: TabType[] = ["Overview", "Limitations"];
 const selectedTab = signal<TabType>("Overview");
+const contentScrollTop = signal(0);
+const maxScrollTop = signal(0);
 
 export default m.Html({
   lang: "en",
@@ -44,12 +40,21 @@ export default m.Html({
                   selectedTabIndex: derived(
                     () => tabs.indexOf(selectedTab.value) || 0
                   ),
-                  onChange: (tabIndex) => (selectedTab.value = tabs[tabIndex]),
+                  onChange: (tabIndex) => {
+                    selectedTab.value = tabs[tabIndex];
+                    contentScrollTop.value = 0;
+                    maxScrollTop.value = 0;
+                  },
                 }),
                 Scrollable({
-                  child: m.Switch({
-                    subject: selectedTab,
-                    cases: { Overview, Limitations },
+                  scrollTop: contentScrollTop,
+                  maxScrollTop: maxScrollTop,
+                  onScrollV: (top, maxHeight) => {
+                    contentScrollTop.value = top;
+                    maxScrollTop.value = maxHeight;
+                  },
+                  child: Paragraphs({
+                    paragraphs: derived(() => PARAGRAPHS[selectedTab.value]),
                   }),
                 }),
               ],

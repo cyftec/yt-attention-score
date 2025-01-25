@@ -1,6 +1,11 @@
 import { derived, signal } from "@cyftech/signal";
 import { m } from "@mufw/maya";
-import { ATTENTION, SELECTOR, UI_ELEM_ID } from "./@libs/constants";
+import {
+  ATTENTION,
+  CHROME_RUNTIME_MESSAGES,
+  SELECTOR,
+  UI_ELEM_ID,
+} from "./@libs/constants";
 import { getNumberFromElement } from "./@libs/utils";
 
 /**
@@ -18,10 +23,10 @@ import { getNumberFromElement } from "./@libs/utils";
  * opposite, i.e. number with point (.) decimal.
  */
 
-const videoUpdatedCount = signal(0);
+const videoUpdateCount = signal(0);
 
 const attentionScore = derived(() => {
-  if (!videoUpdatedCount.value) return "0";
+  if (!videoUpdateCount.value) return "0";
 
   const lang = document.documentElement.lang;
   const viewsCount = getNumberFromElement(SELECTOR.VIEWS_ELEM, lang);
@@ -80,7 +85,7 @@ const attentionScoreUI = m.Div({
 })();
 
 const updateUI = () => {
-  videoUpdatedCount.value++;
+  videoUpdateCount.value++;
   const container = document.querySelector<HTMLElement>(
     SELECTOR.CONTAINER_ELEM
   );
@@ -100,7 +105,7 @@ const updateUI = () => {
 
 const runExtension = () => {
   chrome.runtime.onMessage.addListener((message) => {
-    if (message.videoLoaded) {
+    if (message === CHROME_RUNTIME_MESSAGES.YT_VIDEO_UPDATED) {
       updateUI();
     }
   });
