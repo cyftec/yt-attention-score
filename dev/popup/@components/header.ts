@@ -1,4 +1,5 @@
 import { m } from "@mufw/maya";
+import { HEADER_SUBTITLE, HEADER_TITLE } from "../../@libs/constants";
 
 export const Header = m.Div({
   class: "flex items-center",
@@ -13,11 +14,11 @@ export const Header = m.Div({
       children: [
         m.Div({
           class: "ma0 f3 fw3",
-          children: "YouTube Video Attention Score",
+          children: HEADER_TITLE,
         }),
         m.Div({
           class: "f7 mt1",
-          children: "A Cyfer product",
+          children: HEADER_SUBTITLE,
         }),
       ],
     }),

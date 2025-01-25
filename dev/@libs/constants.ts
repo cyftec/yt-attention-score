@@ -1,5 +1,7 @@
 export const HOST_URL_IDENTIFIER = "https://*.youtube.com/*";
-export const APP_NAME = "YouTube Video Attention Score";
+export const APP_NAME = "YouTube Attention Score";
+export const HEADER_TITLE = APP_NAME;
+export const HEADER_SUBTITLE = "A Cyfer product";
 export const APP_DESCRIPTION =
   "An attention score presenter for a YouTube video.";
 

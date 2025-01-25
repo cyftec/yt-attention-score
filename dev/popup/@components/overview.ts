@@ -24,7 +24,7 @@ export const Overview = m.Div({
     items: paragraphs,
     map: (para) =>
       m.P({
-        class: "tj",
+        class: "tj mt0",
         children: para,
       }),
   }),

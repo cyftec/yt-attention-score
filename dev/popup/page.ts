@@ -1,7 +1,13 @@
 import { derived, signal } from "@cyftech/signal";
-import { m } from "@mufw/maya";
-import { Footer, Header, Limitations, Overview, Tabs } from "./@components";
-import { ScrollButton } from "./@components/scrollbutton";
+import { m, MHtmlElement } from "@mufw/maya";
+import {
+  Footer,
+  Header,
+  Limitations,
+  Overview,
+  Scrollable,
+  Tabs,
+} from "./@components";
 
 type TabType = "Overview" | "Limitations";
 const tabs: TabType[] = ["Overview", "Limitations"];
@@ -33,32 +39,18 @@ export default m.Html({
               children: [
                 Header,
                 Tabs({
-                  classNames: "mv2",
+                  classNames: "mt2",
                   tabs: tabs as unknown as string[],
                   selectedTabIndex: derived(
                     () => tabs.indexOf(selectedTab.value) || 0
                   ),
                   onChange: (tabIndex) => (selectedTab.value = tabs[tabIndex]),
                 }),
-                ScrollButton({
-                  isScrollUp: true,
-                  onclick: function (): void {
-                    throw new Error("Function not implemented.");
-                  },
-                }),
-                m.Div({
-                  class: "h5 overflow-y-scroll",
-                  children: [
-                    m.Switch({
-                      subject: selectedTab,
-                      cases: { Overview, Limitations },
-                    }),
-                  ],
-                }),
-                ScrollButton({
-                  onclick: function (): void {
-                    throw new Error("Function not implemented.");
-                  },
+                Scrollable({
+                  child: m.Switch({
+                    subject: selectedTab,
+                    cases: { Overview, Limitations },
+                  }),
                 }),
               ],
             }),
