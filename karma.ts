@@ -1,3 +1,4 @@
+import { APP_NAME } from "./dev/@libs/constants.ts";
 import type { KarmaConfig, ProjectFileNames } from "./karma-types.ts";
 
 // DO NOT CHANGE exported variable name
@@ -11,7 +12,7 @@ export const projectFileNames: ProjectFileNames = {
   },
   generated: {
     stagingDir: "stage",
-    publishDir: "prod",
+    publishDir: APP_NAME.replaceAll(" ", "_"),
     bunLockFile: "bun.lock",
     bunLockBFile: "bun.lockb",
     gitIgnoreFile: ".gitignore",
@@ -34,12 +35,14 @@ export const config: KarmaConfig = {
       buildablePageFileName: projectFileNames.buildable.pageFile,
       buildableManifestFileName: projectFileNames.buildable.manifestFile,
       ignoreDelimiter: "@",
+      skipErrorAndBuildNext: false,
     },
     localServer: {
       port: 3000,
       redirectOnStart: false,
       reloadPageOnFocus: true,
       serveDirectory: `${projectFileNames.generated.stagingDir}`,
+      otherWatchDirs: [],
     },
   },
   maya: {
@@ -47,7 +50,7 @@ export const config: KarmaConfig = {
     sourceDirName: projectFileNames.static.sourceDir,
     packageJson: {
       dependencies: {
-        "@mufw/maya": "0.1.11",
+        "@mufw/maya": "0.1.13",
         "@cyftech/immutjs": "0.1.0",
         "@cyftech/signal": "0.1.4",
         "@types/chrome": "0.0.297",

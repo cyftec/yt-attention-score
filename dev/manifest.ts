@@ -6,7 +6,7 @@ import {
 
 const manifest: chrome.runtime.ManifestV3 = {
   name: APP_NAME,
-  version: "0.0.1",
+  version: "0.1.0",
   description: APP_DESCRIPTION,
   permissions: ["tabs"],
   host_permissions: [HOST_URL_IDENTIFIER],
@@ -27,9 +27,11 @@ const manifest: chrome.runtime.ManifestV3 = {
   ],
   action: {
     default_icon: {
-      "16": "assets/images/logo.png",
-      "24": "assets/images/logo.png",
-      "32": "assets/images/logo.png",
+      "16": "assets/images/16_logo.png",
+      "24": "assets/images/24_logo.png",
+      "32": "assets/images/32_logo.png",
+      "48": "assets/images/48_logo.png",
+      "128": "assets/images/128_logo.png",
     },
     default_title: APP_NAME,
     default_popup: "popup/index.html",
